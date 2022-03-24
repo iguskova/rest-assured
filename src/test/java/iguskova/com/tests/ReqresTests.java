@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static helpers.CustomAllureListener.withCustomTemplates;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
@@ -17,7 +16,6 @@ public class ReqresTests {
     @BeforeAll
     static void setup(){
         RestAssured.baseURI = "https://reqres.in";
-        RestAssured.filters(new AllureRestAssured());
     }
 
     @Test
@@ -28,16 +26,11 @@ public class ReqresTests {
 
 
         given()
-                .filter(withCustomTemplates())
                 .contentType(JSON)
                 .body(data)
-                .log().uri()
-                .log().body()
                 .when()
                 .post("/api/users")
                 .then()
-                .log().status()
-                .log().body()
                 .statusCode(201)
                 .body("name", is("morpheus"), "job", is("leader"));
     }
@@ -47,13 +40,9 @@ public class ReqresTests {
     void findUser(){
 
         given()
-                .filter(withCustomTemplates())
-                .log().all()
                 .when()
                 .get("/api/users/2")
                 .then()
-                .log().status()
-                .log().body()
                 .statusCode(200)
                 .body("data.id", is(2),
                         "data.email", is("janet.weaver@reqres.in"));
@@ -64,12 +53,9 @@ public class ReqresTests {
     void userNotFound(){
 
         given()
-                .filter(withCustomTemplates())
-                .log().all()
                 .when()
                 .get("/api/users/23")
                 .then()
-                .log().all()
                 .statusCode(404);
     }
 
@@ -80,17 +66,12 @@ public class ReqresTests {
                 "\"password\": \"pistol\"}";
 
         given()
-                .filter(withCustomTemplates())
                 .contentType(JSON)
                 .body(data)
-                .log().body()
                 .when()
                 .post("/api/register")
                 .then()
-                .log().status()
-                .log().body()
                 .statusCode(200)
-                .body(matchesJsonSchemaInClasspath("shemas/generateToken_response_shema.json"))
                 .body("id",is(4),"token",is("QpwL5tke4Pnpja7X4"));
     }
 
@@ -101,14 +82,11 @@ public class ReqresTests {
         String data = "{ \"email\": \"sydney@fife\"}";
 
         given()
-                .filter(withCustomTemplates())
                 .contentType(JSON)
                 .body(data)
-                .log().all()
                 .when()
                 .post("/api/register")
                 .then()
-                .log().all()
                 .statusCode(400)
                 .body("error",is("Missing password"));
     }
